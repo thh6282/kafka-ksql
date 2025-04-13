@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksql-cli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ksql-cli
+  template:
+    metadata:
+      labels:
+        app: ksql-cli
+    spec:
+      containers:
+      - name: ksql-cli
+        image: confluentinc/cp-ksqldb-cli:6.1.0
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do sleep 30; done"]
+        env:
+        - name: KSQLDB_SERVER
+          value: "http://cp-helm-charts-cp-ksql-server:8088"
+        # resources:
+        #   requests:
+        #     memory: "256Mi"
+        #     cpu: "500m"
+        #   limits:
+        #     memory: "512Mi"
+        #     cpu: "1000m"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ksql-cli
+spec:
+  selector:
+    app: ksql-cli
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088
+  type: NodePort
